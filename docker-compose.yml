@@ -12,7 +12,7 @@ services:
 
   mongo-express:
     image: mongo-express:latest
-    container_name: coffee_db_ui
+    container_name: francoffee_db
     ports:
       - "8081:8081"
     environment:
