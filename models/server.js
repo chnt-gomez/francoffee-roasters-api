@@ -12,6 +12,7 @@ class Server {
 
     routes() {
         this.app.use('/products', require('../routes/product'));
+        this.app.use('/checkout', require('../routes/checkout/guestCheckout.routes'))
     }
 
     listen() {
