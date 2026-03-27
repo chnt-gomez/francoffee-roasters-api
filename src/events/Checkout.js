@@ -2,7 +2,7 @@ const Order = require('../schema/orderSchema');
 const Shipment = require ('../schema/shipmentSchema');
 const AuditLog = require ('../schema/auditLogSchema');
 
-const {paymentClient : defaultPaymentClient } = require ('../../clients/mercadopago');
+const {paymentClient : defaultPaymentClient } = require ('../clients/mercadopago');
 
 const doCheckout = async(checkoutDTO, paymentClient= defaultPaymentClient) => {
 
@@ -30,10 +30,10 @@ const doCheckout = async(checkoutDTO, paymentClient= defaultPaymentClient) => {
     await AuditLog.create({
         orderId: order._id,
         event: 'ORDER_INITIALIZED',
-        description: `Checkout started for ${checkoutDto.email}`
+        description: `Checkout started for ${email}`
     });
 
-    const mpPreference = await paymentClient.mpPreference.create({
+    const mpPreference = await paymentClient.preferences.create({
         body: {
             items: items.map(i => ({ ...i, currency_id: 'MXN'})),
             payer,

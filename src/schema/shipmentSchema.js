@@ -1,3 +1,5 @@
+const { mongoose } = require ('mongoose');
+
 const shipmentSchema = mongoose.Schema({
     orderId: {type: mongoose.Schema.Types.ObjectID, ref: 'Order', required: true},
     receipientEmail: String,
@@ -32,4 +34,4 @@ const shipmentSchema = mongoose.Schema({
 
 shipmentSchema.index({location: '2dsphere'});
 
-const Shipment = mongoose.model('Shipment', shipmentSchema);
+module.exports = mongoose.model('Shipment', shipmentSchema);

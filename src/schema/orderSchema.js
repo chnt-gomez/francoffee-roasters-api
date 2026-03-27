@@ -1,3 +1,5 @@
+const { mongoose } = require ('mongoose');
+
 const orderSchema = new mongoose.Schema({
     accountId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -20,12 +22,12 @@ const orderSchema = new mongoose.Schema({
         enum:['pending', 'paid', 'failed', 'refunded'],
         default: 'pending'
     },
-    mpPreferenceOd: String,
-    mpPaymentIdL: String,
+    mpPreferenceId: String,
+    mpPaymentId: String,
     externalReference: {
         type: String,
         unique: true
     }
 }, {timestamps: true});
 
-const Order = mongoose.model('Order', orderSchema);
+module.exports = mongoose.model('Order', orderSchema);

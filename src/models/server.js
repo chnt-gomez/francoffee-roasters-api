@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const { dbConnection } = require ('../database/mongoConfig')
 
 
 
@@ -7,9 +8,8 @@ class Server {
     constructor() {
         this.app = express();
         this.port = process.env.PORT;
-
         this.middleware();
-        this.routes();  
+        this.routes(); 
     }
 
     routes() {
@@ -18,9 +18,13 @@ class Server {
     }
 
     listen() {
-        this.app.listen(this.port, () => {
-            console.log(`francoffee-api-v1 is running at port: ${this.port}`);
-        });
+        try {
+            this.app.listen(this.port, () => {
+                console.log(`francoffee-api-v1 is running at port: ${this.port}`);
+            });
+        } catch (err) {
+            console.error(`Application won't start: ${err}`)
+        }
     }
 
     middleware() {
@@ -28,8 +32,10 @@ class Server {
         this.app.use(express.json());
     }
 
-    mongo(){
-        
+    async start(){
+        await dbConnection();
+        this.listen();
+
     }
 }
 

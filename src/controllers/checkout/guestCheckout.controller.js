@@ -5,7 +5,7 @@ const CheckoutDTO = require('../../dto/CheckoutDTO');
 
 const guestCheckout = async (req, res = response) => {
     try {
-        checkoutData = new CheckoutDTO(req.body);
+        const checkoutData = new CheckoutDTO(req.body);
 
         const result = await doCheckout(checkoutData);
 
@@ -14,7 +14,7 @@ const guestCheckout = async (req, res = response) => {
             ...result
         });
     } catch (err) {
-        console.error('Controller Error:', error);
+        console.error('Controller Error:', err);
         return res.status(500).json({
             ok: false,
             msg: 'The checkout process could not be initialized.'

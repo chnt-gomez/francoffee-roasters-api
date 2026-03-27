@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 const auditLogSchema = new mongoose.Schema({
     orderId: {type: mongoose.Schema.Types.ObjectId, ref : 'Order', index: true},
     event: {type: String, required: true},
@@ -5,4 +7,4 @@ const auditLogSchema = new mongoose.Schema({
     metadata: mongoose.Schema.Types.Mixed,
     timestamp: {type: Date, default: Date.now}
 });
-const Order = mongoose.model('AuditLog', auditLogSchema);
+module.exports = mongoose.model('AuditLog', auditLogSchema);
