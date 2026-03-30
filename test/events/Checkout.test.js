@@ -37,7 +37,8 @@ describe('Checkout event Test Suite', () => {
         auditLogStub = sinon.stub(AuditLog, 'create').resolves();
         mpCreateStub = sinon.stub(mockPaymentClient.preferences, 'create').resolves({
             id: 'pref_123',
-            init_point: 'http://mercadopago.com/test'
+            init_point: 'http://mercadopago.com/test',
+            sandbox_init_point: 'http://mercadopago.com/test'
         });
     });
 
