@@ -35,6 +35,7 @@
     "#events/*": "./src/events/*.js",
     "#models/*": "./src/models/*.js",
     "#routes/*": "./src/routes/*.js",
-    "#schema/*": "./src/schema/*.js"
+    "#schema/*": "./src/schema/*.js",
+    "#middleware/*": "./src/middleware/*.js"
   }
 }

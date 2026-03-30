@@ -27,6 +27,19 @@ const orderSchema = new mongoose.Schema({
     externalReference: {
         type: String,
         unique: true
+    },
+    deliveryDetails: {
+        receipientEmail: String,
+        receipientName: String,
+        address: String,
+        location: {
+            type: {
+                type: String, enum: ['Point'], default: 'Point'
+            },
+            coordinates:[Number]
+        },
+        deliveryNotes: String
+
     }
 }, {timestamps: true});
 

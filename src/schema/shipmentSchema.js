@@ -13,7 +13,7 @@ const shipmentSchema = mongoose.Schema({
     deliveryNotes: String,
     status: {
         type: String,
-        enum: ['pending_payment', 'fulfilling', 'packaging', 'in_transit', 'delayed', 'delivered', 'cancelled'], default: 'pending_payment'
+        enum: ['accepted', 'rejected', 'fulfilling', 'packaging', 'in_transit', 'delayed', 'delivered', 'cancelled'], default: 'accepted'
     },
     carrier: String,
     trackingNumber: String,

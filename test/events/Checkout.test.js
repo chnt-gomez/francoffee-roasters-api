@@ -21,7 +21,8 @@ describe('Checkout event Test Suite', () => {
         totalAmount: 250,
         address: 'Puebla Centro',
         location: { type: 'Point', coordinates: [-98, 19] },
-        deliveryNotes: 'Leave at gate'
+        deliveryNotes: 'Leave at gate',
+        payer: 'User Test'
     };
 
     const mockPaymentClient = {
@@ -41,7 +42,7 @@ describe('Checkout event Test Suite', () => {
     });
 
     afterEach(() => {
-        
+        sinon.restore();
     });
 
     it('should orchestrate the full checkout flow correctly', async () => {
@@ -53,7 +54,6 @@ describe('Checkout event Test Suite', () => {
 
         // Verify Interactions (Sinon / Mockito style)
         expect(orderSaveStub.calledTwice).to.be.true; // Once initial, once with MP ID
-        expect(shipmentSaveStub.calledOnce).to.be.true;
         expect(auditLogStub.calledOnceWith(sinon.match({ event: 'ORDER_INITIALIZED' }))).to.be.true;
         expect(mpCreateStub.calledOnce).to.be.true;
     });
