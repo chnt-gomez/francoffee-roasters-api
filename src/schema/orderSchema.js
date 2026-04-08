@@ -1,0 +1,46 @@
+const { mongoose } = require ('mongoose');
+
+const orderSchema = new mongoose.Schema({
+    accountId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Account',
+        default: null,
+        index: true
+    },
+    email: {type: String, required: true, index: true},
+    items:[
+        {
+            productId: String,
+            title: String,
+            quantity: Number,
+            unit_price: Number
+        }
+    ],
+    totalAmount: {type: Number, required: true},
+    paymentStatus: {
+        type: String,
+        enum:['pending', 'paid', 'failed', 'refunded'],
+        default: 'pending'
+    },
+    mpPreferenceId: String,
+    mpPaymentId: String,
+    externalReference: {
+        type: String,
+        unique: true
+    },
+    deliveryDetails: {
+        receipientEmail: String,
+        receipientName: String,
+        address: String,
+        location: {
+            type: {
+                type: String, enum: ['Point'], default: 'Point'
+            },
+            coordinates:[Number]
+        },
+        deliveryNotes: String
+
+    }
+}, {timestamps: true});
+
+module.exports = mongoose.model('Order', orderSchema);
