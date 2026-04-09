@@ -4,18 +4,19 @@ const Shipment = require('#schema/shipmentSchema');
 const AuditLog = require('#schema/auditLogSchema');
 
 const handleWebhook = async (paymentId, paymentClient = defaultPaymentClient) => {
-    
-    const payment = await(paymentClient.payments.get({ id: paymentId}));
+
+    const payment = await (paymentClient.payments.get({ id: paymentId }));
+
     const { status, external_reference: orderId } = payment;
     const order = await Order.findById(orderId);
 
-    if (!order){
+    if (!order) {
         await AuditLog.create({
             event: 'WEBHOOK_ERROR',
             description: `Received payment ${paymentId} for non-existent order ${orderId}`,
             metadata: { paymentId, status, orderId }
         });
-        return { message: 'Order not found'};
+        return { message: 'Order not found' };
     }
 
     if (order.paymentStatus === 'paid') {
@@ -41,11 +42,11 @@ const handleWebhook = async (paymentId, paymentClient = defaultPaymentClient) =>
     }
 
     // Only accept if
-    if (order.paymentStatus === 'pending' && status==='approved') {
+    if (order.paymentStatus === 'pending' && status === 'approved') {
         order.paymentStatus = 'paid';
         order.mpPaymentId = paymentId.toString();
         await order.save();
-    
+
         const shipment = new Shipment({
             orderId: order._id,
             receipientEmail: order.email,
