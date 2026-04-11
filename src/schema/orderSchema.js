@@ -16,6 +16,11 @@ const orderSchema = new mongoose.Schema({
             unit_price: Number
         }
     ],
+    paymentReference: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
     totalAmount: { type: Number, required: true },
     paymentStatus: {
         type: String,

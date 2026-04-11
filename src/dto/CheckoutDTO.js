@@ -10,6 +10,7 @@ class CheckoutDTO {
         this.address = address;
         this.location = location; // GeoJSON format [lng, lat]
         this.deliveryNotes = deliveryNotes || '';
+        this.totalAmount = 0;
     }
 
 

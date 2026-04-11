@@ -1,7 +1,7 @@
-const crypto = require ('crypto');
-const AuditLog = require ('#schema/auditLogSchema');
+const crypto = require('crypto');
+const auditLogService = require('#services/auditLog.service');
 
-const validateMpSignature = async(req, res, next) => {
+const validateMpSignature = async (req, res, next) => {
     const xSignature = req.headers['x-signature'];
     const xRequestId = req.headers['x-request-id'];
 
@@ -9,7 +9,7 @@ const validateMpSignature = async(req, res, next) => {
         return res.status(401).json({
             message: 'Missing security headers or secret'
         });
-        
+
     }
 
     const secret = process.env.MP_WEBHOOK_SECRET;
@@ -30,7 +30,7 @@ const validateMpSignature = async(req, res, next) => {
         const generatedHash = hmac.digest('hex');
 
         if (generatedHash !== v1) {
-            await AuditLog.create({
+            await auditLogService.create({
                 event: 'SECURITY_ALERT',
                 description: 'Invalid Webhook Signature detected',
                 metadata: { ip: req.ip, dataId }

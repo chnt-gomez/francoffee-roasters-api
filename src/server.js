@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { dbConnection } = require ('../database/mongoConfig')
+const { dbConnection } = require('./database/mongoConfig')
 
 
 
@@ -9,13 +9,12 @@ class Server {
         this.app = express();
         this.port = process.env.PORT;
         this.middleware();
-        this.routes(); 
+        this.routes();
     }
 
     routes() {
-        this.app.use('/products', require('../routes/product'));
-        this.app.use('/checkout', require('../routes/checkout/guestCheckout.routes'))
-        this.app.use('/webhook', require('#routes/webhook/webhook.routes'))
+        this.app.use('/checkout', require('#routes/guestCheckout.routes'))
+        this.app.use('/webhook', require('#routes/webhook.routes'))
     }
 
     listen() {
@@ -33,7 +32,7 @@ class Server {
         this.app.use(express.json());
     }
 
-    async start(){
+    async start() {
         await dbConnection();
         this.listen();
 

@@ -1,5 +1,5 @@
 const BasePaymentProvider = require('#clients/BasePaymentProvider');
-const { paymentClient: mpClient } = require("./mercadopago");
+const { preferenceClient, paymentClient } = require("./mercadopago");
 
 class MercadoPagoProvider extends BasePaymentProvider {
     constructor() {
@@ -8,10 +8,10 @@ class MercadoPagoProvider extends BasePaymentProvider {
 
     async createPaymentOrder(order) {
         const orderReference = order._id.toString()
-        const response = await mpClient.preferences.create({
+        const response = await preferenceClient.preferences.create({
             body: {
                 items: [{
-                    id: `${order._id}`, // Reference to your Mongo ID
+                    id: orderReference,
                     title: 'Venta al público en general',
                     description: 'Compra en FranCoffee Roasters',
                     quantity: 1,
@@ -49,6 +49,10 @@ class MercadoPagoProvider extends BasePaymentProvider {
             paymentOrderId: response.id,
             checkoutUrl: process.env.ENV === 'prod' ? response.init_point : response.sandbox_init_point
         }
+    }
+
+    async lookupPayment(paymentId) {
+        return await paymentClient.payments.get({ id: paymentId });
     }
 }
 

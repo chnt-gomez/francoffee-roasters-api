@@ -1,17 +1,16 @@
-const Order = require('#schema/orderSchema');
-const AuditLog = require('#schema/auditLogSchema');
-const CheckoutDTO = require('#dto/CheckoutDTO')
-const { paymentProcessor: defaultPaymentProcessor } = require('#clients/paymentProcessor');
+const orderService = require('#services/order.service');
+const auditLogService = require('#services/auditLog.service');
+const orderTotalService = require('#services/orderTotal.service');
+const { mpProvider: defaultMpProvider } = require('#clients/paymentProcessor');
 
-const doCheckout = async (requestBody, paymentProcessor = defaultPaymentProcessor) => {
-
-    const checkoutDTO = new CheckoutDTO(requestBody);
+const doCheckout = async (checkoutDTO, mpProvider = defaultMpProvider) => {
 
     const { payer, phone, email, items, address, location, deliveryNotes } = checkoutDTO;
 
-    const total = 460;
+    //The service is returning a static number for now. We will implement this behavior when we have an items schema in the database
+    const total = orderTotalService.calculateTotal(items);
 
-    const order = new Order({
+    const order = await orderService.create({
         email,
         phone,
         items,
@@ -27,22 +26,15 @@ const doCheckout = async (requestBody, paymentProcessor = defaultPaymentProcesso
         totalAmount: total,
     });
 
-    await order.save();
-
-    await AuditLog.create({
+    await auditLogService.create({
         orderId: order._id,
         event: 'ORDER_INITIALIZED',
         description: `Checkout started for ${email}`
     });
 
-    const paymentOrder = await paymentProcessor.createPaymentOrder(order);
+    const paymentOrder = await mpProvider.createPaymentOrder(order);
 
-    console.log(paymentOrder);
-
-
-    //order.externalReference = paymentOrder.id;
-
-    //await order.save();
+    await orderService.updateById(order._id, { paymentReference: paymentOrder.paymentOrderId });
 
     return {
         paymentOrderId: paymentOrder.paymentOrderId,
