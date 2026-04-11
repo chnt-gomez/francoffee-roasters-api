@@ -3,7 +3,7 @@ const { expect } = require('chai');
 const crypto = require('crypto');
 
 const { validateMpSignature } = require('#middleware/validateMPSignature.middleware');
-const AuditLog = require ('#schema/auditLogSchema');
+const auditLogService = require('#services/auditLog.service');
 
 describe('Middleware: validateMpSignature', () => {
     let sandbox;
@@ -26,7 +26,7 @@ describe('Middleware: validateMpSignature', () => {
         };
         next = sandbox.spy();
 
-        sandbox.stub(AuditLog, 'create').resolves();
+        sandbox.stub(auditLogService, 'create').resolves();
     });
 
     afterEach(() => {
@@ -37,7 +37,7 @@ describe('Middleware: validateMpSignature', () => {
         const dataId = '12345';
         const requestId = 'req-001';
         const ts = Math.floor(Date.now() / 1000).toString();
-        
+
         // Generate a valid signature for the test
         const manifest = `id:${dataId};request-id:${requestId};ts:${ts};`;
         const v1 = crypto.createHmac('sha256', SECRET).update(manifest).digest('hex');
@@ -61,7 +61,7 @@ describe('Middleware: validateMpSignature', () => {
 
         expect(next.called).to.be.false;
         expect(res.status.calledWith(401)).to.be.true;
-        expect(AuditLog.create.calledOnceWith(sinon.match({ event: 'SECURITY_ALERT' }))).to.be.true;
+        expect(auditLogService.create.calledOnceWith(sinon.match({ event: 'SECURITY_ALERT' }))).to.be.true;
     });
 
     it('should return 401 if security headers are missing', async () => {

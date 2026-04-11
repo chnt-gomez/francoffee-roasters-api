@@ -1,4 +1,4 @@
-const { mongoose } = require ('mongoose');
+const { mongoose } = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
     accountId: {
@@ -7,8 +7,8 @@ const orderSchema = new mongoose.Schema({
         default: null,
         index: true
     },
-    email: {type: String, required: true, index: true},
-    items:[
+    email: { type: String, required: true, index: true },
+    items: [
         {
             productId: String,
             title: String,
@@ -16,18 +16,18 @@ const orderSchema = new mongoose.Schema({
             unit_price: Number
         }
     ],
-    totalAmount: {type: Number, required: true},
+    paymentReference: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
+    totalAmount: { type: Number, required: true },
     paymentStatus: {
         type: String,
-        enum:['pending', 'paid', 'failed', 'refunded'],
+        enum: ['pending', 'paid', 'failed', 'refunded'],
         default: 'pending'
     },
-    mpPreferenceId: String,
-    mpPaymentId: String,
-    externalReference: {
-        type: String,
-        unique: true
-    },
+    payer: String,
     deliveryDetails: {
         receipientEmail: String,
         receipientName: String,
@@ -36,11 +36,11 @@ const orderSchema = new mongoose.Schema({
             type: {
                 type: String, enum: ['Point'], default: 'Point'
             },
-            coordinates:[Number]
+            coordinates: [Number]
         },
         deliveryNotes: String
 
     }
-}, {timestamps: true});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Order', orderSchema);

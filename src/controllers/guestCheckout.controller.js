@@ -1,23 +1,21 @@
 const { response } = require('express');
-const { doCheckout } = require('../../events/Checkout');
-const CheckoutDTO = require('../../dto/CheckoutDTO');
+const Checkout = require('#events/Checkout');
+const CheckoutDTO = require('#dto/CheckoutDTO');
 
 
 const guestCheckout = async (req, res = response) => {
     try {
         const checkoutData = new CheckoutDTO(req.body);
 
-        const result = await doCheckout(checkoutData);
+        const result = await Checkout.doCheckout(checkoutData);
 
         return res.status(201).json({
-            ok: true,
+            message: 'Payment order created',
             ...result
         });
     } catch (err) {
-        console.error('Controller Error:', err);
         return res.status(500).json({
-            ok: false,
-            msg: 'The checkout process could not be initialized.'
+            message: 'The checkout process could not be initialized.'
         });
     }
 }

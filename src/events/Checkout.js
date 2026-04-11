@@ -1,15 +1,20 @@
-const Order = require('../schema/orderSchema');
-const AuditLog = require ('../schema/auditLogSchema');
+const orderService = require('#services/order.service');
+const auditLogService = require('#services/auditLog.service');
+const orderTotalService = require('#services/orderTotal.service');
+const { mpProvider: defaultMpProvider } = require('#clients/paymentProcessor');
 
-const {paymentClient : defaultPaymentClient } = require ('../clients/mercadopago');
+const doCheckout = async (checkoutDTO, mpProvider = defaultMpProvider) => {
 
-const doCheckout = async(checkoutDTO, paymentClient= defaultPaymentClient) => {
+    const { payer, phone, email, items, address, location, deliveryNotes } = checkoutDTO;
 
-    const {payer, email, items, totalAmount, address, location, deliveryNotes} = checkoutDTO;
-    const order = new Order({
+    //The service is returning a static number for now. We will implement this behavior when we have an items schema in the database
+    const total = orderTotalService.calculateTotal(items);
+
+    const order = await orderService.create({
         email,
+        phone,
         items,
-        totalAmount,
+        totalAmount: total,
         paymentStatus: 'pending',
         deliveryDetails: {
             receipientEmail: email,
@@ -17,64 +22,23 @@ const doCheckout = async(checkoutDTO, paymentClient= defaultPaymentClient) => {
             address,
             location,
             deliveryNotes
-        }
+        },
+        totalAmount: total,
     });
 
-    order.externalReference = order._id.toString();
-
-    await order.save();
-
-    await AuditLog.create({
+    await auditLogService.create({
         orderId: order._id,
         event: 'ORDER_INITIALIZED',
         description: `Checkout started for ${email}`
     });
 
-    const mpPreference = await paymentClient.preferences.create({
-        body: {
-            items: items.map((i, index) => ({ 
-                id: i.productId || i._id || `COFFEE-ITEM-${index}`,
-                title: i.title,
-                description: i.title,
-                quantity: Number(i.quantity),
-                unit_price: Number(i.unit_price),
-                currency_id: 'MXN'
-            })),
-            payer: {
-                name: payer,
-                email:email,           
-            },
-            external_reference: order.externalReference,
-            binary_mode: true,
-            back_urls: {
-                success: `${process.env.FRONTEND_URL}/success`,
-                failure: `${process.env.FRONTEND_URL}/error`,
-            },
-            auto_return: "approved",
-            payment_methods: {
-                excluded_payment_types: [
-                    { id: "ticket" },        // Excludes OXXO, 7-Eleven, etc.
-                    { id: "bank_transfer" }, // Excludes SPEI / Bank transfers
-                    { id: "atm" }            // Excludes ATM payments
-                ],
-                installments: 1,             // Maximum number of installments allowed
-                default_installments: 1      // Pre-selects 1 installment
-            },
-        },
-        options: {
-            idempotencyKey: order._id.toString()
-        }
-    });
+    const paymentOrder = await mpProvider.createPaymentOrder(order);
 
-    order.mpPreferenceId = mpPreference.id;
-
-    await order.save();
-
-    let initPoint = process.env.ENV === 'prod' ? mpPreference.init_point : mpPreference.sandbox_init_point;
+    await orderService.updateById(order._id, { paymentReference: paymentOrder.paymentOrderId });
 
     return {
-        preferenceId: mpPreference.id,
-        initPoint,
+        paymentOrderId: paymentOrder.paymentOrderId,
+        checkoutUrl: paymentOrder.checkoutUrl,
         orderId: order._id
     };
 

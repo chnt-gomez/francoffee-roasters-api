@@ -8,7 +8,7 @@
   "main": "app.js",
   "scripts": {
     "test": "mocha \"test/**/*.test.js\" --exit",
-  "test:watch": "mocha \"test/**/*.test.js\" --watch",
+    "test:watch": "mocha \"test/**/*.test.js\" --watch",
     "test:grep": "mocha \"test/*.test.js\" -g",
     "test:only": "mocha",
     "dev": "docker-compose up -d && npx nodemon src/app"
@@ -25,7 +25,8 @@
     "chai": "^6.2.2",
     "jest": "^30.3.0",
     "mocha": "^11.7.5",
-    "sinon": "^21.0.3"
+    "sinon": "^21.0.3",
+    "supertest": "^7.2.2"
   },
   "imports": {
     "#clients/*": "./src/clients/*.js",
@@ -36,6 +37,8 @@
     "#models/*": "./src/models/*.js",
     "#routes/*": "./src/routes/*.js",
     "#schema/*": "./src/schema/*.js",
-    "#middleware/*": "./src/middleware/*.js"
+    "#services/*": "./src/services/*.js",
+    "#middleware/*": "./src/middleware/*.js",
+    "#webhooks/*": "./src/webhooks/*.js"
   }
 }
