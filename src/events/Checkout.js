@@ -20,7 +20,7 @@ const doCheckout = async (checkoutDTO, mpProvider = defaultMpProvider) => {
     await orderService.updateById(order._id,
         {
             paymentReference: paymentOrder.paymentOrderId,
-            statusUpdatedAt: Date.now,
+            statusUpdatedAt: Date.now(),
             deliveryDetails: {
                 receipientEmail: email,
                 receipientName: payer,
