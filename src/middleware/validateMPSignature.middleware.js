@@ -41,7 +41,6 @@ const validateMpSignature = async (req, res, next) => {
         next();
 
     } catch (err) {
-        console.error('Signature Validation Error:', err.message);
         return res.status(401).json({ message: 'Authentication failed' });
     }
 };

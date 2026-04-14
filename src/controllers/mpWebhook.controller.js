@@ -20,7 +20,7 @@ const handleWebhook = async (req, res = response) => {
             action === 'payment.updated') {
             MPWebhook.handlePayment(id, data).catch(
                 err => {
-                    console.error(`Failed background processing for ${id}:`, err);
+                    //console.error(`Failed background processing for ${id}:`, err);
                 }
             )
         }

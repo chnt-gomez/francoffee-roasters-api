@@ -38,7 +38,11 @@ const orderSchema = new mongoose.Schema({
             },
             coordinates: [Number]
         },
-        deliveryNotes: String
+        deliveryNotes: String,
+        statusUpdatedAt: {
+            type: Date,
+            default: Date.now
+        },
 
     }
 }, { timestamps: true });

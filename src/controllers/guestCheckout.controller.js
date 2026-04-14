@@ -1,6 +1,8 @@
 const { response } = require('express');
 const Checkout = require('#events/Checkout');
+const PreCheckout = require('#events/PreCheckout');
 const CheckoutDTO = require('#dto/CheckoutDTO');
+const PreCheckoutDTO = require('#dto/PreCheckoutDTO');
 
 
 const guestCheckout = async (req, res = response) => {
@@ -18,6 +20,14 @@ const guestCheckout = async (req, res = response) => {
             message: 'The checkout process could not be initialized.'
         });
     }
+}
+
+const preCheckout = async (req, res = response) => {
+    const preCheckoutData = new PreCheckoutDTO(req.body);
+
+    const result = await PreCheckout.doPreCheckout(preCheckoutData);
+
+
 }
 
 module.exports = {
