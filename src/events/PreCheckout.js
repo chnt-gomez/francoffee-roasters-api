@@ -3,7 +3,8 @@ const orderService = require('#services/order.service')
 
 const doPreCheckout = async (PreCheckoutDTO) => {
     const { items } = PreCheckoutDTO;
-    const total = orderTotalService.calculateTotal(items);
+
+    const total = await orderTotalService.calculateTotal(items);
 
     const order = await orderService.create({
         email: 'guest',
@@ -11,14 +12,16 @@ const doPreCheckout = async (PreCheckoutDTO) => {
         totalAmount: total,
         paymentStatus: 'pending',
         totalAmount: total,
-
+        statusUpdatedAt: Date.now()
     });
 
+    const detailedOrder = await orderService.findByIdDetailed(order._id);
+
     return {
-
+        detailedOrder
     }
+}
 
-
-
-
+module.exports = {
+    doPreCheckout
 }

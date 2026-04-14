@@ -8,6 +8,10 @@ const findById = async (id) => {
     return await Order.findById(id);
 };
 
+const findByIdDetailed = async (id) => {
+    return await Order.findById(id).populate('items.productId');
+}
+
 const find = async (filter = {}) => {
     return await Order.find(filter);
 };
@@ -23,6 +27,7 @@ const deleteById = async (id) => {
 module.exports = {
     create,
     findById,
+    findByIdDetailed,
     find,
     updateById,
     deleteById

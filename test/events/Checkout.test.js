@@ -8,7 +8,7 @@ const auditLogService = require('#services/auditLog.service');
 const { doCheckout } = require('#events/Checkout');
 
 describe('doCheckout event', () => {
-    let orderCreateStub;
+    let orderFindByIdStub;
     let orderUpdateByIdStub;
     let auditLogCreateStub;
     let mockMpProvider;
@@ -16,8 +16,7 @@ describe('doCheckout event', () => {
     const mockDto = {
         payer: 'Test User',
         email: 'test@test.com',
-        phone: '555-0000',
-        items: [{ title: 'Veracruz Coffee', quantity: 1, unit_price: 250 }],
+        orderId: 'order-abc-123',
         address: 'Puebla Centro',
         location: { type: 'Point', coordinates: [-98, 19] },
         deliveryNotes: 'Leave at gate'
@@ -25,7 +24,8 @@ describe('doCheckout event', () => {
 
     const mockOrder = {
         _id: 'order-abc-123',
-        email: 'test@test.com',
+        email: 'guest',
+        totalAmount: 500,
         paymentStatus: 'pending'
     };
 
@@ -35,7 +35,7 @@ describe('doCheckout event', () => {
     };
 
     beforeEach(() => {
-        orderCreateStub = sinon.stub(orderService, 'create').resolves(mockOrder);
+        orderFindByIdStub = sinon.stub(orderService, 'findById').resolves(mockOrder);
         orderUpdateByIdStub = sinon.stub(orderService, 'updateById').resolves();
         auditLogCreateStub = sinon.stub(auditLogService, 'create').resolves();
 
@@ -57,22 +57,13 @@ describe('doCheckout event', () => {
             });
         });
 
-        it('should create the order with the correct payload', async () => {
+        it('should look up the existing order by orderId from the DTO', async () => {
             await doCheckout(mockDto, mockMpProvider);
 
-            expect(orderCreateStub.calledOnceWith(sinon.match({
-                email: mockDto.email,
-                items: mockDto.items,
-                paymentStatus: 'pending',
-                deliveryDetails: sinon.match({
-                    receipientEmail: mockDto.email,
-                    receipientName: mockDto.payer,
-                    address: mockDto.address
-                })
-            }))).to.be.true;
+            expect(orderFindByIdStub.calledOnceWith(mockDto.orderId)).to.be.true;
         });
 
-        it('should create an ORDER_INITIALIZED audit log entry for the new order', async () => {
+        it('should create an ORDER_INITIALIZED audit log entry referencing the order', async () => {
             await doCheckout(mockDto, mockMpProvider);
 
             expect(auditLogCreateStub.calledOnceWith(sinon.match({
@@ -81,31 +72,38 @@ describe('doCheckout event', () => {
             }))).to.be.true;
         });
 
-        it('should call mpProvider.createPaymentOrder with the created order', async () => {
+        it('should call mpProvider.createPaymentOrder with the found order', async () => {
             await doCheckout(mockDto, mockMpProvider);
 
             expect(mockMpProvider.createPaymentOrder.calledOnceWith(mockOrder)).to.be.true;
         });
 
-        it('should update the order with the paymentReference returned by the provider', async () => {
+        it('should update the order with the paymentReference and delivery details', async () => {
             await doCheckout(mockDto, mockMpProvider);
 
             expect(orderUpdateByIdStub.calledOnceWith(
                 mockOrder._id,
-                { paymentReference: mockPaymentOrder.paymentOrderId }
+                sinon.match({
+                    paymentReference: mockPaymentOrder.paymentOrderId,
+                    deliveryDetails: sinon.match({
+                        receipientEmail: mockDto.email,
+                        receipientName: mockDto.payer,
+                        address: mockDto.address
+                    })
+                })
             )).to.be.true;
         });
     });
 
     describe('error handling', () => {
-        it('should propagate the error and skip remaining steps when orderService.create fails', async () => {
-            orderCreateStub.rejects(new Error('DB write failed'));
+        it('should propagate the error and skip remaining steps when the order is not found', async () => {
+            orderFindByIdStub.rejects(new Error('Order not found'));
 
             try {
                 await doCheckout(mockDto, mockMpProvider);
                 expect.fail('Expected doCheckout to throw');
             } catch (err) {
-                expect(err.message).to.equal('DB write failed');
+                expect(err.message).to.equal('Order not found');
             }
 
             expect(auditLogCreateStub.called).to.be.false;

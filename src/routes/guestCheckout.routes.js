@@ -1,9 +1,10 @@
 const { Router } = require('express');
 
-const { guestCheckout } = require('#controllers/guestCheckout.controller');
+const { guestCheckout, preCheckout } = require('#controllers/guestCheckout.controller');
 
 const router = Router();
 
-router.post('/', guestCheckout);
+router.post('/apply', guestCheckout);
+router.post('/pre', preCheckout)
 
 module.exports = router;

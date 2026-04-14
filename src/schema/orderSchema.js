@@ -1,19 +1,16 @@
 const { mongoose } = require('mongoose');
 
 const orderSchema = new mongoose.Schema({
-    accountId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Account',
-        default: null,
-        index: true
-    },
     email: { type: String, required: true, index: true },
     items: [
         {
-            productId: String,
-            title: String,
-            quantity: Number,
-            unit_price: Number
+            _id: false,
+            productId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Item',
+                required: true
+            },
+            qty: Number,
         }
     ],
     paymentReference: {
@@ -39,12 +36,11 @@ const orderSchema = new mongoose.Schema({
             coordinates: [Number]
         },
         deliveryNotes: String,
-        statusUpdatedAt: {
-            type: Date,
-            default: Date.now
-        },
-
-    }
+    },
+    statusUpdatedAt: {
+        type: Date,
+        default: Date.now()
+    },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Order', orderSchema);

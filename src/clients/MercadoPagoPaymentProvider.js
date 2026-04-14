@@ -6,7 +6,7 @@ class MercadoPagoProvider extends BasePaymentProvider {
         super('MercadoPago');
     }
 
-    async createPaymentOrder(order) {
+    async createPaymentOrder(order, payer, email) {
         const orderReference = order._id.toString()
         const response = await preferenceClient.preferences.create({
             body: {
@@ -19,8 +19,8 @@ class MercadoPagoProvider extends BasePaymentProvider {
                     currency_id: 'MXN'
                 }],
                 payer: {
-                    name: order.payer,
-                    email: order.email,
+                    name: payer,
+                    email: email,
                 },
                 external_reference: orderReference,
                 binary_mode: true,
