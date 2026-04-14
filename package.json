@@ -7,13 +7,38 @@
   "type": "commonjs",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx nodemon app"
+    "test": "mocha \"test/**/*.test.js\" --exit",
+    "test:watch": "mocha \"test/**/*.test.js\" --watch",
+    "test:grep": "mocha \"test/*.test.js\" -g",
+    "test:only": "mocha",
+    "dev": "docker-compose up -d && npx nodemon src/app"
   },
   "dependencies": {
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
-    "mongodb": "^7.1.1"
+    "mercadopago": "^2.12.0",
+    "mongodb": "^7.1.1",
+    "mongoose": "^9.3.3"
+  },
+  "devDependencies": {
+    "chai": "^6.2.2",
+    "jest": "^30.3.0",
+    "mocha": "^11.7.5",
+    "sinon": "^21.0.3",
+    "supertest": "^7.2.2"
+  },
+  "imports": {
+    "#clients/*": "./src/clients/*.js",
+    "#controllers/*": "./src/controllers/*.js",
+    "#database/*": "./src/database/*.js",
+    "#dto/*": "./src/dto/*.js",
+    "#events/*": "./src/events/*.js",
+    "#models/*": "./src/models/*.js",
+    "#routes/*": "./src/routes/*.js",
+    "#schema/*": "./src/schema/*.js",
+    "#services/*": "./src/services/*.js",
+    "#middleware/*": "./src/middleware/*.js",
+    "#webhooks/*": "./src/webhooks/*.js"
   }
 }
