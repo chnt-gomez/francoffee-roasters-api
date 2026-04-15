@@ -26,7 +26,8 @@ class MercadoPagoProvider extends BasePaymentProvider {
                 binary_mode: true,
                 back_urls: {
                     success: `localhost:5173/checkout/success`,
-                    failure: `localhost:5173/checkout/error`,
+                    failure: `localhost:5173/checkout/failed`,
+                    pending: `localhost:5173/checkout/`
                 },
                 auto_return: "approved",
                 payment_methods: {

@@ -13,6 +13,7 @@ class Server {
     }
 
     routes() {
+        this.app.use('/items', require('#routes/item.routes'))
         this.app.use('/checkout', require('#routes/guestCheckout.routes'))
         this.app.use('/webhook', require('#routes/webhook.routes'))
     }
