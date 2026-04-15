@@ -11,7 +11,8 @@
     "test:watch": "mocha \"test/**/*.test.js\" --watch",
     "test:grep": "mocha \"test/*.test.js\" -g",
     "test:only": "mocha",
-    "dev": "docker-compose up -d && npx nodemon src/app"
+    "dev": "docker-compose up -d && npx nodemon src/app",
+    "seed-items": "node scripts/seedItems.js"
   },
   "dependencies": {
     "cors": "^2.8.6",
